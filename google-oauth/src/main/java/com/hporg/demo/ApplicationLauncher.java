@@ -1,7 +1,8 @@
 package com.hporg.demo;
 
 /**
- * Hello world!
+ * @author hrishabh.purohit
+ * Launcher class for the demo application.
  *
  */
 public class ApplicationLauncher 
