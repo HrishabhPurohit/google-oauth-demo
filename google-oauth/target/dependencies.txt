@@ -1,0 +1,9 @@
+digraph "com.hporg.demo:google-oauth:jar:1.0-SNAPSHOT" { 
+	"com.hporg.demo:google-oauth:jar:1.0-SNAPSHOT" -> "junit:junit:jar:4.11:test" ; 
+	"com.hporg.demo:google-oauth:jar:1.0-SNAPSHOT" -> "org.apache.logging.log4j:log4j:pom:2.17.1:compile" ; 
+	"junit:junit:jar:4.11:test" -> "org.hamcrest:hamcrest-core:jar:1.3:test" ; 
+ } digraph "com.hporg.demo:google-oauth:jar:1.0-SNAPSHOT" { 
+	"com.hporg.demo:google-oauth:jar:1.0-SNAPSHOT" -> "junit:junit:jar:4.11:test" ; 
+	"com.hporg.demo:google-oauth:jar:1.0-SNAPSHOT" -> "org.apache.logging.log4j:log4j:pom:2.17.1:compile" ; 
+	"junit:junit:jar:4.11:test" -> "org.hamcrest:hamcrest-core:jar:1.3:test" ; 
+ } 
