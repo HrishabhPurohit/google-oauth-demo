@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Properties>
+		<Property name = "logFileName">${bundle:application:logging.file.name}</Property>
+	</Properties>
+	<Appenders>
+
+		<Console name="stdout" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="[%d{dd-MM-yy HH:mm:ss,SSS z}] %t %5p %c{2}:%L - %m%n" />
+			<ThresholdFilter level="debug" />
+		</Console>
+
+		<RollingFile
+			name="R" fileName="${sys:logFileName}"
+			filePattern=".%d{yyyy-MM-dd-HH}">
+			<PatternLayout>
+				<pattern>%d{dd MMM yyyy HH:mm:ss,SSS} %t %5p %c{1}:%L - %m%n
+				</pattern>
+			</PatternLayout>
+			<ThresholdFilter level="debug" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+		</RollingFile>
+
+	</Appenders>
+	
+	<Loggers>
+	<Root level="debug" includeLocation="true">
+		<AppenderRef ref="stdout" />
+		<AppenderRef ref="R" />
+	</Root>
+	<Logger name="org.springframework" level="debug" additivity="false" includeLocation="true">
+      <AppenderRef ref="R"/>
+    </Logger>
+    <Logger name="org.springframework.boot.autoconfigure" level="error" additivity="false" includeLocation="true">
+      <AppenderRef ref="R"/>
+    </Logger>
+    <Logger name="com.hporg.demo" level="debug" additivity="false" includeLocation="true">
+      <AppenderRef ref="R"/>
+    </Logger>
+</Loggers>
+</Configuration>
