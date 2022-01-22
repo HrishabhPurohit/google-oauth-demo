@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 /**
  * @author hrishabh.purohit
  * <p>Launcher class for the demo application.
- * <p>This application primarily uses <code>JavaMail</code> API for operating on user's email inbox.
+ * <p>This application primarily uses <code>Gmail API</code> for operating on user's email inbox.
  * <p><b>NOTE:</b> OAuth 2.0 is provided by Google OAuth client libraries, declared as dependencies to this application.
  */
 @SpringBootApplication

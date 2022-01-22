@@ -27,6 +27,9 @@ public class ApplicationLauncherTest {
     @Value("${logging.file.name}")
     private String logFileName;
 
+    /**
+     * Test all the application properties here.
+     */
     @Test
     public void isApplicationPropertyReady(){
         assertNotNull(debug);
