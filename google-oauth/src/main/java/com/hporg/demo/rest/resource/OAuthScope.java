@@ -2,6 +2,10 @@ package com.hporg.demo.rest.resource;
 
 import java.util.Arrays;
 
+/**
+ * @author hrishabh.purohit
+ * POJO representing the allowed scope for a given Google API
+ */
 public class OAuthScope {
     private String scopeServiceName;
     private String scopeLabel;
