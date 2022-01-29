@@ -31,6 +31,7 @@ public class SupportedGoogleAPIsResource implements GoogleOAuthDemoRestResourceS
     private static final Logger LOGGER = LogManager.getLogger(SupportedGoogleAPIsResource.class);
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<SupportedGoogleAPIs> get() {
         try{
             LOGGER.debug("Attempting to read list of supported APIs from JSON file.");
@@ -65,7 +66,7 @@ public class SupportedGoogleAPIsResource implements GoogleOAuthDemoRestResourceS
     }
 
     @Override
-    public SupportedGoogleAPIs post() {
+    public SupportedGoogleAPIs post(String payload) {
         return null;
     }
 }
