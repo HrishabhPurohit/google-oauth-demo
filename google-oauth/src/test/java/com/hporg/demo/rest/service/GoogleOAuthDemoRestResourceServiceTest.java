@@ -2,7 +2,6 @@ package com.hporg.demo.rest.service;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.notNull;
 
 import java.util.List;
 

@@ -7,3 +7,10 @@ Functioning:
     - The user has created OAuth 2.0 client that represents this utility application.
     - All these tasks are done using the gmail id, that user provides during onboarding phase.
         - This ensures that the mail id to be operated on has proper authorization. If not the same, the email id should be already added to the list of test users, as this is an "External" type of application.
+
+However, the implementation is agnostic of the OAuth 2.0 provider:
+- Given the email domain of the user, the utility tries to guess the Email Provider. This guess is based on a preconfigured mapping.
+- For ex: xxxx.xx@gmail.com, where gmail.com is the domain name, the Email Provider is Google's Gmail.
+- Likewise for xxx.xx@outlook.com, where outlook.com is the domain name, the Email Provider is Microsoft's Outlook.
+
+NOTE: While it is a best practice to have an application distributed into multiple modules handling mutually exclusive components, this utility has every component packaged into single module. This is purely for the sake of convenience.

@@ -27,6 +27,8 @@ public class ApplicationLauncherTest {
     @Value("${logging.file.name}")
     private String logFileName;
 
+    @Value("${google.oauth.approach}")
+    private String googleOAuthApproach;
     /**
      * Test all the application properties here.
      */
@@ -36,5 +38,6 @@ public class ApplicationLauncherTest {
         assertNotNull(serverPort);
         assertNotNull(loggingConfig);
         assertNotNull(logFileName);
+        assertNotNull(googleOAuthApproach);
     }
 }
