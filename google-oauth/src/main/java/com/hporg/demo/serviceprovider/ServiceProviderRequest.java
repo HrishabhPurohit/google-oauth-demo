@@ -9,6 +9,7 @@ import com.hporg.demo.serviceprovider.api.client.IServiceProviderAPIClient;
 import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @author hrishabh.purohit
@@ -42,6 +43,7 @@ public final class ServiceProviderRequest {
         private String user;
 
         @Autowired
+        @Qualifier("serviceProviderOAuthManager")
         private AbstractServiceProviderOAuthManager oauthManager;
 
         public RequestBuilder withServiceProvider(AbstractServiceProvider serviceProvider) {
