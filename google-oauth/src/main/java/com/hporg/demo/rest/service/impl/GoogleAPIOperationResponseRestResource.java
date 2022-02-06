@@ -1,11 +1,15 @@
 package com.hporg.demo.rest.service.impl;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hporg.demo.rest.resource.GoogleAPIActionResponse;
 import com.hporg.demo.rest.service.GoogleOAuthDemoRestResourceService;
+import com.hporg.demo.serviceprovider.ServiceProviderRequest;
+import com.hporg.demo.serviceprovider.ServiceProviderRequestExecutor;
+import com.hporg.demo.utils.GoogleOAuthDemoUtil;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,12 +60,37 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
             throw new IllegalArgumentException(e.getMessage());
         }
 
-        
-        return null;
+        GoogleAPIActionResponse response = null;
+
+        try {
+            if(GoogleOAuthDemoUtil.isSPRCached(generateKeyForSPRCache())){
+                response = GoogleOAuthDemoUtil.getSPRFromCache(generateKeyForSPRCache());
+            }
+            else{
+                ServiceProviderRequest spRequest = new ServiceProviderRequest.RequestBuilder()
+                                                                            .withServiceProvider(GoogleOAuthDemoUtil.resolveServiceProviderFromUserName(this.userForOperation))
+                                                                            .withAPI(this.apiForOperation)
+                                                                            .withScopes(this.scopeForOperation)
+                                                                            .withUser(this.userForOperation)
+                                                                            .withClient()
+                                                                            .build();
+
+                response = ServiceProviderRequestExecutor.execute(spRequest, actionForOperation);
+                GoogleOAuthDemoUtil.initRequestCaching(generateKeyForSPRCache(), response);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return response;
     }
     
     @Override
     public String toString() {
         return "User : " + this.userForOperation + ", Action : " + this.actionForOperation + ", Scope : " + this.scopeForOperation + ", API : " + this.apiForOperation;
+    }
+
+    private String generateKeyForSPRCache(){
+        return this.userForOperation + "|" + this.apiForOperation + "|" + this.actionForOperation;
     }
 }

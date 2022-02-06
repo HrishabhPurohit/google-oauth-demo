@@ -14,8 +14,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.gmail.Gmail;
 import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager;
 import com.hporg.demo.utils.GoogleOAuthDemoUtil;
 
@@ -35,7 +33,6 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private final static Logger LOGGER = LogManager.getLogger(GmailOAuthManagerImpl.class);
-    private final static String APP_NAME_FOR_GOOGLE_OAUTH = "GoogleOAuthDemo";
 
     @Autowired
     public GmailOAuthManagerImpl(@Value("${google.oauth.approach}") String approach) {
@@ -43,11 +40,19 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Gmail getOAuthCredentials() throws IOException {
-        Gmail gmailService = null;
+    public OAuthTokenImpl getOAuthCredentials() throws IOException {
+        OAuthTokenImpl oauthCredentialObject = null;
 
         try {
+            if(GoogleOAuthDemoUtil.isTokenCached(this.getUser())){
+                oauthCredentialObject = (OAuthTokenImpl) GoogleOAuthDemoUtil.getTokenFromTokenCache(this.getUser());
+                if(oauthCredentialObject.isExpired()){
+                    oauthCredentialObject.refreshToken();
+                }
+                
+                return oauthCredentialObject;
+            }
+
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             if (this.getApproach().equals("END_CLIENT_INTERACTIVE")) {
                 GoogleClientSecrets clientSecret = GoogleClientSecrets.load(JSON_FACTORY,
@@ -60,24 +65,37 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
                 
                 LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
                 Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize(this.getUser());
+                credential.refreshToken();
 
-                gmailService = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                                .setApplicationName(APP_NAME_FOR_GOOGLE_OAUTH)
-                                .build();
+                oauthCredentialObject = new OAuthTokenImpl(credential);
+                cacheUserOAuthToken(oauthCredentialObject);
             } else if (this.getApproach().equals("END_CLIENT_NOT_INTERACTIVE")) {
                 // TODO: Implement service account approach here.
+                /**Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize(this.getUser());
+                credential.refreshToken();
+
+                oauthCredentialObject = new OAuthTokenImpl(credential);
+                cacheUserOAuthToken(oauthCredentialObject); */
             }
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
 
-        return gmailService;
+        return oauthCredentialObject;
+    }
+
+    private void cacheUserOAuthToken(OAuthTokenImpl oauthToken){
+        GoogleOAuthDemoUtil.initTokenCaching(this.getUser(), oauthToken);
     }
 
     private class OAuthTokenImpl extends AbstractServiceProviderOAuthManager.AbstractOAuthToken {
 
-        public OAuthTokenImpl(String accessToken, Long expirationTimeInMillis) {
-            super(accessToken, expirationTimeInMillis);
+        private Credential oauthCredentialObject;
+
+        public OAuthTokenImpl(Credential oauthCredentialObject) {
+            this.oauthCredentialObject = oauthCredentialObject;
+            this.setAccessToken(oauthCredentialObject.getAccessToken());
+            this.setExpirationTimeInMillis(oauthCredentialObject.getExpirationTimeMilliseconds());
         }
 
         @Override
@@ -89,6 +107,19 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
             }
 
             return false;
+        }
+
+        @Override
+        public void refreshToken() throws IOException {
+            this.oauthCredentialObject.refreshToken();
+            this.setAccessToken(oauthCredentialObject.getAccessToken());
+            this.setExpirationTimeInMillis(oauthCredentialObject.getExpirationTimeMilliseconds());
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public Credential getOAuthCredentialObject() {
+            return this.oauthCredentialObject;
         }
     }
 }

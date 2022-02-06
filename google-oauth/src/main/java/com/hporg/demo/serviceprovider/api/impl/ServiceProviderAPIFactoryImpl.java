@@ -20,5 +20,4 @@ public class ServiceProviderAPIFactoryImpl implements IServiceProviderAPIFactory
     public AbstractServiceProviderAPI buildAPI(String apiLabel) {
         return GoogleOAuthDemoUtil.resolveServiceProviderAPIFromAPIName(apiLabel);
     }
-    
 }

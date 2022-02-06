@@ -5,5 +5,5 @@ package com.hporg.demo.serviceprovider.api.client;
  */
 public interface IServiceProviderAPIClientFactory {
 
-    public IServiceProviderAPIClient buildAPIClient(String serviceProviderAPIName);
+    public <T> IServiceProviderAPIClient<T> buildAPIClient(String serviceProviderAPIName);
 }

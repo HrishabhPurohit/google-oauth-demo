@@ -35,7 +35,7 @@ public final class ServiceProviderRequest {
         }
     }
 
-    public class RequestBuilder {
+    public static final class RequestBuilder {
         private AbstractServiceProvider serviceProvider;
         private AbstractServiceProviderAPI api;
         private IServiceProviderAPIClient apiClient;

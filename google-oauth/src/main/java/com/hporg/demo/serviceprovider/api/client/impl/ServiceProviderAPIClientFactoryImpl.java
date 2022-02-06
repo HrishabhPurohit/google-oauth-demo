@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 public class ServiceProviderAPIClientFactoryImpl implements IServiceProviderAPIClientFactory{
 
     @Override
-    public IServiceProviderAPIClient buildAPIClient(String serviceProviderAPIName) {
+    @SuppressWarnings("unchecked")
+    public IServiceProviderAPIClient<?> buildAPIClient(String serviceProviderAPIName) {
         return GoogleOAuthDemoUtil.resolveAPIClientFromAPIName(serviceProviderAPIName);
     }
 }
