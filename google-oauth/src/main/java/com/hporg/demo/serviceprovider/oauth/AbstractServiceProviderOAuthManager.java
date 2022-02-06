@@ -1,5 +1,6 @@
 package com.hporg.demo.serviceprovider.oauth;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ public abstract class AbstractServiceProviderOAuthManager{
     private String approach;
     private List<String> scopes;
     private String user;
-
+    
     public List<String> getScopes() {
         return scopes;
     }
@@ -35,5 +36,32 @@ public abstract class AbstractServiceProviderOAuthManager{
         this.approach = approach;
     }
 
-    public abstract <T> T getOAuthCredentials();
+    public abstract AbstractOAuthToken getOAuthCredentials() throws IOException;
+
+    public abstract class AbstractOAuthToken {
+        private String accessToken;
+        private Long expirationTimeInMillis;
+        
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        public void setExpirationTimeInMillis(Long expirationTimeInMillis) {
+            this.expirationTimeInMillis = expirationTimeInMillis;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public Long getExpirationTimeInMillis() {
+            return expirationTimeInMillis;
+        }
+
+        public abstract boolean isExpired();
+
+        public abstract void refreshToken() throws IOException;
+
+        public abstract <T> T getOAuthCredentialObject();
+    };
 }

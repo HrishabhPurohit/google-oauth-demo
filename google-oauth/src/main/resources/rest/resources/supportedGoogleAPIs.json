@@ -7,25 +7,31 @@
                 "scopeServiceName" : "https://mail.google.com/",
                 "scopeLabel" : "Master scope",
                 "description" : "All operations allowed on user's inbox",
-                "allowedActions" : ["Read Mail", "Compose Mail", "Send Mail", "Delete Mail"]
+                "allowedActions" : ["READ_MAIL", "COMPOSE_MAIL", "SEND_MAIL", "DELETE_MAIL"]
             },
             {
                 "scopeServiceName" : "https://www.googleapis.com/auth/gmail.readonly",
                 "scopeLabel" : "Read only scope",
                 "description": "Only read operation allowed",
-                "allowedActions" : ["Read Mail", "Read Settings"]
+                "allowedActions" : ["READ_MAIL", "READ_SETTINGS"]
+            },
+            {
+                "scopeServiceName" : "https://www.googleapis.com/auth/gmail.labels",
+                "scopeLabel" : "Manage Labels scope",
+                "description": "Manage labels on your mailbox",
+                "allowedActions" : ["READ_LABEL", "DELETE_LABEL"]
             },
             {
                 "scopeServiceName" : "https://www.googleapis.com/auth/gmail.send",
                 "scopeLabel" : "Send scope",
                 "description" : "Only send operation allowed",
-                "allowedActions" : ["Send Mail"]
+                "allowedActions" : ["SEND_MAIL"]
             },
             {
                 "scopeServiceName" : "https://www.googleapis.com/auth/gmail.modify",
                 "scopeLabel" : "Modify scope",
                 "description" : "Only modify operations allowed, excluding delete",
-                "allowedActions" : ["Modify Mail"]
+                "allowedActions" : ["MODIFY_MAIL"]
             }
         ]
     }
