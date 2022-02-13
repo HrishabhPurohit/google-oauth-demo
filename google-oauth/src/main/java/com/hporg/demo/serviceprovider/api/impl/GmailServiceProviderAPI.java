@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @author hrishabh.purohit
+ * <p> Gmail specific implementation of <code>AbstractServiceProviderAPI</code>.
+ * <p> Primary responsibility is provide a hook to a <code>IServiceProviderAPIClientFactory</code> implementaion for the caller to be able to build an instance of <code>IServiceProviderAPIClient</code>
  */
 public class GmailServiceProviderAPI extends AbstractServiceProviderAPI{
 

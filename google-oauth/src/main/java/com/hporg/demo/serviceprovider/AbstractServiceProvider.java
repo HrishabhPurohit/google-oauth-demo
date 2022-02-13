@@ -5,6 +5,7 @@ import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager;
 
 /**
  * @author hrishabh.purohit
+ * @see GoogleServiceProvider
  */
 public abstract class AbstractServiceProvider {
 
@@ -13,6 +14,11 @@ public abstract class AbstractServiceProvider {
     
     public AbstractServiceProvider(String providerName){
         this.providerNameLabel = providerName;
+    }
+
+    @Override
+    public String toString() {
+        return "SERVICE PROVIDER : " + this.providerNameLabel;
     }
 
     public AbstractServiceProviderOAuthManager getOauthManager() {

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author hrishabh.purohit
+ * <p> Abstract factory implementation for <code>IServiceProviderAPIFactory</code>
+ * <p> Primary responsibilty is to provide a way to build an <code>AbstractServiceProviderAPI</code> instance given the api name.
  */
 @Component
 @Scope("singleton")

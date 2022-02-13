@@ -1,5 +1,7 @@
 package com.hporg.demo.rest.resource;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * @author hrishabh.purohit
  */
@@ -13,4 +15,14 @@ public class GoogleAPIActionResponse {
     }
 
     private String result;
+
+    private HttpStatus statusCode;
+
+    public HttpStatus getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(HttpStatus statusCode) {
+        this.statusCode = statusCode;
+    }
 }

@@ -8,4 +8,5 @@ public class Constants {
     public static final String GET_REQUEST = "GET";
     public static final String OAUTH_CLIENT_APPROACH_STRING = "oauth_client_approach";
     public static final String OAUTH_WEB_APP_APPROACH_STRING = "oauth_web_app_approach";
+    public static final String APP_NAME_FOR_GOOGLE_OAUTH = "GoogleOAuthDemo";
 }
