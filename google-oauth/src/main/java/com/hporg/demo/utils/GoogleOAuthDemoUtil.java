@@ -27,16 +27,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author hrishabh.purohit
+ * Static utility class for google oauth demo. Primary responsibilities include:
+ * <p> 1. Caching serviceProvider implementation for a given domain.
+ * <p> 2. Caching serviceProviderAPI implementation for a given api name.
+ * <p> 3. Caching serviceProviderAPIClient implementation for a given api name.
+ * <p> 4. Asynchronous caching of serviceProviderRequest for a given set of user inputs.
+ * <p> 5. Asynchronous caching of oauthToken implementation for a given user name.
  */
 public class GoogleOAuthDemoUtil {
     
     private static final Logger LOGGER = LogManager.getLogger(GoogleOAuthDemoUtil.class);
-    private static Map<String, AbstractServiceProvider> domainVsServiceProvider;
-    private static Map<String, AbstractServiceProviderAPI> apiNameVsServiceProviderAPI;
-    private static Map<String, IServiceProviderAPIClient<?>> apiNameVsServiceProviderAPIClient;
-    private static ExecutorService executorService = Executors.newFixedThreadPool(3);
-    private static Map<String, GoogleAPIActionResponse> serviceProviderRequestCache;
-    private static Map<String, AbstractOAuthToken> oauthTokenCache;
+    private static final Map<String, AbstractServiceProvider> DOMAIN_VS_SERVICE_PROVIDER_CACHE;
+    private static final Map<String, AbstractServiceProviderAPI> API_NAME_VS_SERVICE_PROVIDER_API_CACHE;
+    private static final Map<String, IServiceProviderAPIClient<?>> API_NAME_VS_SERVICE_PROVIDER_API_CLIENT;
+    private static final ExecutorService EXECUTOR_SERVICE;
+    private static final Map<String, GoogleAPIActionResponse> SERVICE_PROVIDER_REQUEST_CACHE;
+    private static final Map<String, AbstractOAuthToken> OAUTH_TOKEN_CACHE;
 
     @Autowired
     @Value("${google.oauth.approach.credfile.path}")
@@ -45,23 +51,32 @@ public class GoogleOAuthDemoUtil {
     static{
         LOGGER.debug("Initializing domain vs service provider cache");
 
-        domainVsServiceProvider = new HashMap<String, AbstractServiceProvider>();
-        domainVsServiceProvider.put(EServiceProviders.GMAIL.getDomainName(), new GoogleServiceProvider(EServiceProviders.GMAIL.getDomainName()));
+        DOMAIN_VS_SERVICE_PROVIDER_CACHE = new HashMap<String, AbstractServiceProvider>();
+        DOMAIN_VS_SERVICE_PROVIDER_CACHE.put(EServiceProviders.GMAIL.getDomainName(), new GoogleServiceProvider(EServiceProviders.GMAIL.getDomainName()));
 
         LOGGER.debug("Successfully initialized domain vs service provider cache");
         LOGGER.debug("Initializing name vs service provider api cache");
 
-        apiNameVsServiceProviderAPI = new HashMap<String, AbstractServiceProviderAPI>();
-        apiNameVsServiceProviderAPI.put(EServiceProviderAPIs.GMAIL.getApiName(), new GmailServiceProviderAPI(EServiceProviderAPIs.GMAIL.getApiName()));
+        API_NAME_VS_SERVICE_PROVIDER_API_CACHE = new HashMap<String, AbstractServiceProviderAPI>();
+        API_NAME_VS_SERVICE_PROVIDER_API_CACHE.put(EServiceProviderAPIs.GMAIL.getApiName(), new GmailServiceProviderAPI(EServiceProviderAPIs.GMAIL.getApiName()));
 
         LOGGER.debug("Successfully initialized name vs service provider api cache");
         LOGGER.debug("Initializing name vs service provider api client cache");
 
-        apiNameVsServiceProviderAPIClient = new HashMap<String, IServiceProviderAPIClient<?>>();
-        apiNameVsServiceProviderAPIClient.put(EServiceProviderAPIs.GMAIL.getApiName(), new GmailAPIClient());
+        API_NAME_VS_SERVICE_PROVIDER_API_CLIENT = new HashMap<String, IServiceProviderAPIClient<?>>();
+        API_NAME_VS_SERVICE_PROVIDER_API_CLIENT.put(EServiceProviderAPIs.GMAIL.getApiName(), new GmailAPIClient());
 
-        serviceProviderRequestCache = new ConcurrentHashMap<String, GoogleAPIActionResponse>();
-        oauthTokenCache = new ConcurrentHashMap<String, AbstractOAuthToken>();
+        LOGGER.debug("Initializing service provider request cache map");
+        SERVICE_PROVIDER_REQUEST_CACHE = new ConcurrentHashMap<String, GoogleAPIActionResponse>();
+        LOGGER.debug("Successfully initialized service provider request cache map");
+
+        LOGGER.debug("Initializing oauth token cache map");
+        OAUTH_TOKEN_CACHE = new ConcurrentHashMap<String, AbstractOAuthToken>();
+        LOGGER.debug("Successfully initialized oauth token cache map");
+
+        LOGGER.debug("Initializing threadpool for executor service");
+        EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
+        LOGGER.debug("Successfully initialized threadpool of 2 threads for executor service");
     }
     
     public static AbstractServiceProvider resolveServiceProviderFromUserName(String userName){
@@ -71,15 +86,15 @@ public class GoogleOAuthDemoUtil {
             domainName = userName.substring(userName.indexOf("@") + 1);
         }
         
-        return domainVsServiceProvider.get(domainName);
+        return DOMAIN_VS_SERVICE_PROVIDER_CACHE.get(domainName);
     }
 
     public static AbstractServiceProviderAPI resolveServiceProviderAPIFromAPIName(String apiName){
-        return apiNameVsServiceProviderAPI.get(apiName);
+        return API_NAME_VS_SERVICE_PROVIDER_API_CACHE.get(apiName);
     }
 
     public static IServiceProviderAPIClient<?> resolveAPIClientFromAPIName(String apiName){
-        return apiNameVsServiceProviderAPIClient.get(apiName);
+        return API_NAME_VS_SERVICE_PROVIDER_API_CLIENT.get(apiName);
     }
 
     public static InputStream getCredentialFileForOAuthClient(){
@@ -87,31 +102,33 @@ public class GoogleOAuthDemoUtil {
     }
 
     public static void initRequestCaching(final String key, final GoogleAPIActionResponse spr){
-        executorService.submit(new Callable<Void>() {
+        EXECUTOR_SERVICE.submit(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                serviceProviderRequestCache.put(generateHash(key), spr);
+                SERVICE_PROVIDER_REQUEST_CACHE.put(generateHash(key), spr);
                 return null;
             }
         });
     }
 
     public static void initTokenCaching(final String key, final AbstractOAuthToken value){
-        executorService.submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                oauthTokenCache.put(key, value);
-                return null;
-            }
-        });
+        if(!OAUTH_TOKEN_CACHE.containsKey(key)){
+            EXECUTOR_SERVICE.submit(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    OAUTH_TOKEN_CACHE.put(key, value);
+                    return null;
+                }
+            });
+        }
     }
 
     public static AbstractOAuthToken getTokenFromTokenCache(String key){
-        return oauthTokenCache.get(key);
+        return OAUTH_TOKEN_CACHE.get(key);
     }
 
     public static boolean isTokenCached(String key){
-        return oauthTokenCache.containsKey(key);
+        return OAUTH_TOKEN_CACHE.containsKey(key);
     }
 
     private static String generateHash(String input) throws NoSuchAlgorithmException{
@@ -126,11 +143,27 @@ public class GoogleOAuthDemoUtil {
         return stringBuilder.toString();
     }
 
-    public static boolean isSPRCached(String key) throws NoSuchAlgorithmException{
-        return serviceProviderRequestCache.containsKey(generateHash(key));
+    public static Boolean isSPRCached(String key){
+        String hash;
+        try{
+            hash = generateHash(key);
+        } catch (NoSuchAlgorithmException e){
+            LOGGER.error("Exception occurred while generating hash string for key : " + key);
+            return null;
+        }
+
+        return SERVICE_PROVIDER_REQUEST_CACHE.containsKey(hash);
     }
 
-    public static GoogleAPIActionResponse getSPRFromCache(String key) throws NoSuchAlgorithmException{
-        return serviceProviderRequestCache.get(generateHash(key));
+    public static GoogleAPIActionResponse getSPRFromCache(String key){
+        String hash;
+        try{
+            hash = generateHash(key);
+        } catch (NoSuchAlgorithmException e){
+            LOGGER.error("Exception occurred while generating hash string for key : " + key);
+            return null;
+        }
+
+        return SERVICE_PROVIDER_REQUEST_CACHE.get(hash);
     }
 }

@@ -3,17 +3,17 @@ package com.hporg.demo.serviceprovider.impl;
 import com.hporg.demo.serviceprovider.AbstractServiceProvider;
 import com.hporg.demo.serviceprovider.api.IServiceProviderAPIFactory;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @author hrishabh.purohit
+ * <p> Google specific Implementation for <code>AbstractServiceProvider</code>
+ * <p> Primary responsibilities include:
+ * <p> 1. Providing a hook to <code>IServiceProviderAPIFactory</code> implementation for the caller to build required API instatnce.
+ * <p> 2. Providing a <code>AbstractServiceProviderOAuthManager</code> implementation for the caller to execute the end client's request.
  */
 public class GoogleServiceProvider extends AbstractServiceProvider{
-
-    private static final Logger LOGGER = LogManager.getLogger(GoogleServiceProvider.class);
 
     @Autowired
     @Qualifier("serviceProviderAPIFactoryImpl")

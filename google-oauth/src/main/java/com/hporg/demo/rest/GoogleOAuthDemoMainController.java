@@ -8,6 +8,7 @@ import com.hporg.demo.rest.service.GoogleOAuthDemoRestResourceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>This class acts as the master controller. Responsibilties:
  * <p>1. Request navigation to specific api version resources.
  * <p>2. Param and request validation.
+ * <p>3. Responding with meaningful http status codes and corresponding results.
  */
 @RestController
 @RequestMapping(value = "/api/demo/google-oauth")
@@ -39,7 +41,9 @@ public class GoogleOAuthDemoMainController {
     }
     
     @PostMapping(value = "/action", headers = "X-API-VERSION=1", consumes = "application/json")
-    public GoogleAPIActionResponse performActionV1(@RequestBody String payload){
-        return googleAPIResponseRestResourceService.post(payload);
+    public ResponseEntity<String> performActionV1(@RequestBody String payload){
+        GoogleAPIActionResponse response = googleAPIResponseRestResourceService.post(payload);
+        
+        return ResponseEntity.status(response.getStatusCode()).body(response.getResult());
     }
 }

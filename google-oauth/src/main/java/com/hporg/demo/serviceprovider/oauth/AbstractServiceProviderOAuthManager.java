@@ -1,10 +1,10 @@
 package com.hporg.demo.serviceprovider.oauth;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * @author hrishabh.purohit
+ * @see GmailOAuthManagerImpl
  */
 public abstract class AbstractServiceProviderOAuthManager{
     
@@ -36,9 +36,11 @@ public abstract class AbstractServiceProviderOAuthManager{
         this.approach = approach;
     }
 
-    public abstract AbstractOAuthToken getOAuthCredentials() throws IOException;
+    public abstract AbstractOAuthToken getOAuthCredentials() throws Exception;
 
     public abstract class AbstractOAuthToken {
+        //TODO: Take care of properly masking access token before logging.
+
         private String accessToken;
         private Long expirationTimeInMillis;
         
@@ -60,7 +62,7 @@ public abstract class AbstractServiceProviderOAuthManager{
 
         public abstract boolean isExpired();
 
-        public abstract void refreshToken() throws IOException;
+        public abstract void refreshToken() throws Exception;
 
         public abstract <T> T getOAuthCredentialObject();
     };

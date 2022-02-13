@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * @author hrishabh.purohit
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "rawtypes"})
 public final class ServiceProviderRequest {
 
     private final AbstractServiceProvider serviceProvider;
@@ -52,6 +52,9 @@ public final class ServiceProviderRequest {
         }
 
         public RequestBuilder withAPI(String api) {
+            if(this.serviceProvider == null){
+                throw new IllegalArgumentException("ERROR: Caller attempted to build API without having a Service Provider.");
+            }
             this.api = this.serviceProvider
                     .getAPIFactory()
                     .buildAPI(api);
@@ -59,12 +62,18 @@ public final class ServiceProviderRequest {
         }
 
         public RequestBuilder withScopes(List<String> scopes) {
+            if(this.oauthManager == null){
+                throw new IllegalArgumentException("ERROR: No OAuth manager found to set the scopes for");
+            }
             this.scopes = scopes;
             this.oauthManager.setScopes(scopes);
             return this;
         }
 
         public RequestBuilder withClient() {
+            if(this.api == null){
+                throw new IllegalArgumentException("ERROR: Caller attempted to build API Client without having an API");
+            }
             this.apiClient = this.api
                     .getAPIClientFactory()
                     .buildAPIClient(this.api.getServiceProviderAPIName());
@@ -72,6 +81,9 @@ public final class ServiceProviderRequest {
         }
 
         public RequestBuilder withUser(String user){
+            if(this.oauthManager == null){
+                throw new IllegalArgumentException("ERROR: No OAuth manager found to set the user for");
+            }
             this.user = user;
             this.oauthManager.setUser(user);
             return this;
@@ -102,5 +114,10 @@ public final class ServiceProviderRequest {
 
     public String getUser() {
         return user;
+    }
+
+    @Override
+    public String toString() {
+        return "SERVICE PROVIDER REQUEST : [ USER : " + this.user + " | SERVICE PROVIDER : " + this.serviceProvider.toString() + " | API : " + this.api.toString() + " | SCOPE : " + this.scopes.toString();
     }
 }
