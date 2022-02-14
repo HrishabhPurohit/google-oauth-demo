@@ -48,11 +48,14 @@ public class GoogleOAuthDemoUtil {
     @Value("${google.oauth.approach.credfile.path}")
     private static String CRED_FILE_PATH;
 
+    @Autowired
+    private static AbstractServiceProvider serviceProvider;
+
     static{
         LOGGER.debug("Initializing domain vs service provider cache");
 
         DOMAIN_VS_SERVICE_PROVIDER_CACHE = new HashMap<String, AbstractServiceProvider>();
-        DOMAIN_VS_SERVICE_PROVIDER_CACHE.put(EServiceProviders.GMAIL.getDomainName(), new GoogleServiceProvider(EServiceProviders.GMAIL.getDomainName()));
+        DOMAIN_VS_SERVICE_PROVIDER_CACHE.put(EServiceProviders.GMAIL.getDomainName(), serviceProvider);
 
         LOGGER.debug("Successfully initialized domain vs service provider cache");
         LOGGER.debug("Initializing name vs service provider api cache");

@@ -38,12 +38,12 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
         LOGGER.debug("Inside populateOperationFields method.");
         
         ObjectMapper jsonObjectMapper = new ObjectMapper();
-        Map<String, List<String>> jsonPayload = (Map<String, List<String>>) jsonObjectMapper.readValue(payload, Map.class);
+        Map<String, Object> jsonPayload = (Map<String, Object>) jsonObjectMapper.readValue(payload, Map.class);
 
-        this.userForOperation = jsonPayload.get("user").get(0);
-        this.actionForOperation = jsonPayload.get("action").get(0);
-        this.scopeForOperation = jsonPayload.get("scopes");
-        this.apiForOperation = jsonPayload.get("api").get(0);
+        this.userForOperation = (String) jsonPayload.get("user");
+        this.actionForOperation = (String) jsonPayload.get("action");
+        this.scopeForOperation = (List<String>) jsonPayload.get("scopes");
+        this.apiForOperation = (String) jsonPayload.get("api");
 
         LOGGER.debug("Extracted details from the payload : " + this.toString());
     }
@@ -90,14 +90,17 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
 
                 GoogleOAuthDemoUtil.initRequestCaching(generateKeyForSPRCache(), response);
             } catch(IOException e){
+                LOGGER.error("Exception occurred.",e);
                 response = new GoogleAPIActionResponse();
                 response.setResult("");
                 response.setStatusCode(HttpStatus.FOUND);
             } catch (IllegalArgumentException e){
+                LOGGER.error("Exception occurred.",e);
                 response = new GoogleAPIActionResponse();
                 response.setResult("");
                 response.setStatusCode(HttpStatus.BAD_REQUEST);
             } catch (Exception e){
+                LOGGER.error("Exception occurred.",e);
                 response = new GoogleAPIActionResponse();
                 response.setResult("");
                 response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
