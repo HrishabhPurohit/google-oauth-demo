@@ -3,9 +3,6 @@ package com.hporg.demo.rest.service;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import com.hporg.demo.rest.resource.SupportedGoogleAPIs;
