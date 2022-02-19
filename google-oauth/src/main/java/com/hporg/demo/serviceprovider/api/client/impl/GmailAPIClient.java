@@ -20,6 +20,9 @@ import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager.
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * @author hrishabh.purohit
@@ -27,6 +30,9 @@ import org.apache.logging.log4j.Logger;
  * <p> All the methods take the client service object {@link Gmail} as an input to perform all the client operations. 
  * Authorization and authentication operations are not to be confused with client specific tasks and shall not be included here.
  */
+@Component
+@Scope("prototype")
+@Qualifier("gmailAPIClient")
 public class GmailAPIClient implements IServiceProviderAPIClient<Gmail>{
     
     private static final Logger LOGGER = LogManager.getLogger(GmailAPIClient.class);

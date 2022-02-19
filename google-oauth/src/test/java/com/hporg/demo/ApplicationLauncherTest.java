@@ -29,6 +29,9 @@ public class ApplicationLauncherTest {
 
     @Value("${google.oauth.approach}")
     private String googleOAuthApproach;
+
+    @Value("${google.oauth.approach.credfile.path}")
+    private String credFilePath;
     /**
      * Test all the application properties here.
      */
@@ -39,5 +42,6 @@ public class ApplicationLauncherTest {
         assertNotNull(loggingConfig);
         assertNotNull(logFileName);
         assertNotNull(googleOAuthApproach);
+        assertNotNull(credFilePath);
     }
 }
