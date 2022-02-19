@@ -12,7 +12,8 @@ public abstract class AbstractServiceProvider {
     private String providerNameLabel;
     private AbstractServiceProviderOAuthManager oauthManager;
     
-    public AbstractServiceProvider(String providerName){
+    public AbstractServiceProvider(String providerName, AbstractServiceProviderOAuthManager oauthManager){
+        this.oauthManager = oauthManager;
         this.providerNameLabel = providerName;
     }
 
@@ -23,10 +24,6 @@ public abstract class AbstractServiceProvider {
 
     public AbstractServiceProviderOAuthManager getOauthManager() {
         return oauthManager;
-    }
-
-    public void setOauthManager(AbstractServiceProviderOAuthManager oauthManager) {
-        this.oauthManager = oauthManager;
     }
 
     public String getProviderNameLabel() {

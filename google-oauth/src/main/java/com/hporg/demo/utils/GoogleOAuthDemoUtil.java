@@ -1,5 +1,7 @@
 package com.hporg.demo.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -11,19 +13,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.google.api.client.util.Value;
+import javax.annotation.PostConstruct;
+
 import com.hporg.demo.rest.resource.GoogleAPIActionResponse;
 import com.hporg.demo.serviceprovider.AbstractServiceProvider;
 import com.hporg.demo.serviceprovider.api.AbstractServiceProviderAPI;
-import com.hporg.demo.serviceprovider.api.client.IServiceProviderAPIClient;
-import com.hporg.demo.serviceprovider.api.client.impl.GmailAPIClient;
-import com.hporg.demo.serviceprovider.api.impl.GmailServiceProviderAPI;
-import com.hporg.demo.serviceprovider.impl.GoogleServiceProvider;
 import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager.AbstractOAuthToken;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * @author hrishabh.purohit
@@ -33,42 +35,42 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <p> 3. Caching serviceProviderAPIClient implementation for a given api name.
  * <p> 4. Asynchronous caching of serviceProviderRequest for a given set of user inputs.
  * <p> 5. Asynchronous caching of oauthToken implementation for a given user name.
+ * 
+ * <p> NOTE: Ideally, should not use @Component. This can be considered a trade off for acheiving spring IoC. ALthough comes with all static methods, a singleton.
  */
-public class GoogleOAuthDemoUtil {
+@Component
+public class GoogleOAuthDemoUtil{
     
     private static final Logger LOGGER = LogManager.getLogger(GoogleOAuthDemoUtil.class);
     private static final Map<String, AbstractServiceProvider> DOMAIN_VS_SERVICE_PROVIDER_CACHE;
     private static final Map<String, AbstractServiceProviderAPI> API_NAME_VS_SERVICE_PROVIDER_API_CACHE;
-    private static final Map<String, IServiceProviderAPIClient<?>> API_NAME_VS_SERVICE_PROVIDER_API_CLIENT;
     private static final ExecutorService EXECUTOR_SERVICE;
     private static final Map<String, GoogleAPIActionResponse> SERVICE_PROVIDER_REQUEST_CACHE;
     private static final Map<String, AbstractOAuthToken> OAUTH_TOKEN_CACHE;
+    private static String CREDENTIAL_FILE_PATH;
 
-    @Autowired
     @Value("${google.oauth.approach.credfile.path}")
-    private static String CRED_FILE_PATH;
+    private String credFilePath;
+    
+    @Autowired
+    @Qualifier("googleServiceProvider")
+    private AbstractServiceProvider serviceProvider;
 
     @Autowired
-    private static AbstractServiceProvider serviceProvider;
+    @Qualifier("gmailServiceProviderAPI")
+    private AbstractServiceProviderAPI serviceProviderAPI;
 
     static{
         LOGGER.debug("Initializing domain vs service provider cache");
 
         DOMAIN_VS_SERVICE_PROVIDER_CACHE = new HashMap<String, AbstractServiceProvider>();
-        DOMAIN_VS_SERVICE_PROVIDER_CACHE.put(EServiceProviders.GMAIL.getDomainName(), serviceProvider);
 
         LOGGER.debug("Successfully initialized domain vs service provider cache");
         LOGGER.debug("Initializing name vs service provider api cache");
 
         API_NAME_VS_SERVICE_PROVIDER_API_CACHE = new HashMap<String, AbstractServiceProviderAPI>();
-        API_NAME_VS_SERVICE_PROVIDER_API_CACHE.put(EServiceProviderAPIs.GMAIL.getApiName(), new GmailServiceProviderAPI(EServiceProviderAPIs.GMAIL.getApiName()));
 
         LOGGER.debug("Successfully initialized name vs service provider api cache");
-        LOGGER.debug("Initializing name vs service provider api client cache");
-
-        API_NAME_VS_SERVICE_PROVIDER_API_CLIENT = new HashMap<String, IServiceProviderAPIClient<?>>();
-        API_NAME_VS_SERVICE_PROVIDER_API_CLIENT.put(EServiceProviderAPIs.GMAIL.getApiName(), new GmailAPIClient());
-
         LOGGER.debug("Initializing service provider request cache map");
         SERVICE_PROVIDER_REQUEST_CACHE = new ConcurrentHashMap<String, GoogleAPIActionResponse>();
         LOGGER.debug("Successfully initialized service provider request cache map");
@@ -81,7 +83,15 @@ public class GoogleOAuthDemoUtil {
         EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
         LOGGER.debug("Successfully initialized threadpool of 2 threads for executor service");
     }
-    
+
+    @PostConstruct
+    public void init(){
+        GoogleOAuthDemoUtil.CREDENTIAL_FILE_PATH = credFilePath;
+
+        GoogleOAuthDemoUtil.DOMAIN_VS_SERVICE_PROVIDER_CACHE.put(EServiceProviders.GMAIL.getDomainName(), serviceProvider);
+        GoogleOAuthDemoUtil.API_NAME_VS_SERVICE_PROVIDER_API_CACHE.put(EServiceProviderAPIs.GMAIL.getApiName(), serviceProviderAPI);
+    }
+
     public static AbstractServiceProvider resolveServiceProviderFromUserName(String userName){
         String domainName = null;
 
@@ -96,12 +106,15 @@ public class GoogleOAuthDemoUtil {
         return API_NAME_VS_SERVICE_PROVIDER_API_CACHE.get(apiName);
     }
 
-    public static IServiceProviderAPIClient<?> resolveAPIClientFromAPIName(String apiName){
-        return API_NAME_VS_SERVICE_PROVIDER_API_CLIENT.get(apiName);
-    }
-
     public static InputStream getCredentialFileForOAuthClient(){
-        return GoogleOAuthDemoUtil.class.getResourceAsStream(CRED_FILE_PATH);
+        FileInputStream fis = null;
+        try{
+            fis = new FileInputStream(new File(CREDENTIAL_FILE_PATH));
+        } catch(Exception e) {
+            LOGGER.error("Unable to local credential file for authentication of the user.",e);
+        }
+
+        return fis;
     }
 
     public static void initRequestCaching(final String key, final GoogleAPIActionResponse spr){

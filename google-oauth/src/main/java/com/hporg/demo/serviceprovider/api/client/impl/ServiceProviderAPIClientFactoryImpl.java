@@ -2,9 +2,11 @@ package com.hporg.demo.serviceprovider.api.client.impl;
 
 import com.hporg.demo.serviceprovider.api.client.IServiceProviderAPIClient;
 import com.hporg.demo.serviceprovider.api.client.IServiceProviderAPIClientFactory;
-import com.hporg.demo.utils.GoogleOAuthDemoUtil;
+import com.hporg.demo.utils.EServiceProviderAPIs;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +20,18 @@ import org.springframework.stereotype.Component;
 @Qualifier("serviceProviderAPIClientFactoryImpl")
 public class ServiceProviderAPIClientFactoryImpl implements IServiceProviderAPIClientFactory{
 
+    @Autowired
+    private ApplicationContext appContext;
+
     @Override
     @SuppressWarnings("unchecked")
     public IServiceProviderAPIClient<?> buildAPIClient(String serviceProviderAPIName) {
-        return GoogleOAuthDemoUtil.resolveAPIClientFromAPIName(serviceProviderAPIName);
+        IServiceProviderAPIClient<?> client = null;
+
+        if(serviceProviderAPIName.equals(EServiceProviderAPIs.GMAIL.getApiName())){
+            client = (IServiceProviderAPIClient<?>) appContext.getBean("gmailAPIClient");
+        }
+
+        return client;
     }
 }

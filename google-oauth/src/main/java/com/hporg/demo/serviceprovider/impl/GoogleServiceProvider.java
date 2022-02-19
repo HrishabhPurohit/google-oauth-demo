@@ -2,7 +2,7 @@ package com.hporg.demo.serviceprovider.impl;
 
 import com.hporg.demo.serviceprovider.AbstractServiceProvider;
 import com.hporg.demo.serviceprovider.api.IServiceProviderAPIFactory;
-import com.hporg.demo.utils.EServiceProviders;
+import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
  * <p> 2. Providing a <code>AbstractServiceProviderOAuthManager</code> implementation for the caller to execute the end client's request.
  */
 @Component
+@Qualifier("googleServiceProvider")
 public class GoogleServiceProvider extends AbstractServiceProvider{
 
     @Autowired
@@ -24,8 +25,8 @@ public class GoogleServiceProvider extends AbstractServiceProvider{
     private IServiceProviderAPIFactory serviceProviderAPIFActory;
 
     @Autowired
-    public GoogleServiceProvider(@Value("#{T(com.hporg.demo.utils.EServiceProviders).GMAIL.getDomainName()}") String domainName){
-        super(domainName);
+    public GoogleServiceProvider(@Value("#{T(com.hporg.demo.utils.EServiceProviders).GMAIL.getDomainName()}") String domainName, @Qualifier("serviceProviderOAuthManager") AbstractServiceProviderOAuthManager oauthManager){
+        super(domainName, oauthManager);
     }
 
     @Override

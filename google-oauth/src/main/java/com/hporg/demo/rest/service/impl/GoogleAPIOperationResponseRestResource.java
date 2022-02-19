@@ -32,7 +32,7 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
     private String actionForOperation;
     private List<String> scopeForOperation;
     private String apiForOperation;
-
+    
     @SuppressWarnings("unchecked")
     private void populateOperationFields(String payload) throws Exception{
         LOGGER.debug("Inside populateOperationFields method.");
@@ -78,9 +78,9 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
                 ServiceProviderRequest spRequest = new ServiceProviderRequest.RequestBuilder()
                                                                             .withServiceProvider(GoogleOAuthDemoUtil.resolveServiceProviderFromUserName(this.userForOperation))
                                                                             .withAPI(this.apiForOperation)
+                                                                            .withClient()
                                                                             .withScopes(this.scopeForOperation)
                                                                             .withUser(this.userForOperation)
-                                                                            .withClient()
                                                                             .build();
 
                 String apiResponse = ServiceProviderRequestExecutor.execute(spRequest, actionForOperation);
@@ -92,17 +92,17 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
             } catch(IOException e){
                 LOGGER.error("Exception occurred.",e);
                 response = new GoogleAPIActionResponse();
-                response.setResult("");
+                response.setResult(e.getMessage());
                 response.setStatusCode(HttpStatus.FOUND);
             } catch (IllegalArgumentException e){
                 LOGGER.error("Exception occurred.",e);
                 response = new GoogleAPIActionResponse();
-                response.setResult("");
+                response.setResult(e.getMessage());
                 response.setStatusCode(HttpStatus.BAD_REQUEST);
             } catch (Exception e){
                 LOGGER.error("Exception occurred.",e);
                 response = new GoogleAPIActionResponse();
-                response.setResult("");
+                response.setResult(e.getMessage());
                 response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }

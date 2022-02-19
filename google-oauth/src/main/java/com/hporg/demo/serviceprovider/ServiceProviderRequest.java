@@ -42,10 +42,6 @@ public final class ServiceProviderRequest {
         private List<String> scopes;
         private String user;
 
-        @Autowired
-        @Qualifier("serviceProviderOAuthManager")
-        private AbstractServiceProviderOAuthManager oauthManager;
-
         public RequestBuilder withServiceProvider(AbstractServiceProvider serviceProvider) {
             this.serviceProvider = serviceProvider;
             return this;
@@ -62,11 +58,11 @@ public final class ServiceProviderRequest {
         }
 
         public RequestBuilder withScopes(List<String> scopes) {
-            if(this.oauthManager == null){
+            if(this.serviceProvider.getOauthManager() == null){
                 throw new IllegalArgumentException("ERROR: No OAuth manager found to set the scopes for");
             }
             this.scopes = scopes;
-            this.oauthManager.setScopes(scopes);
+            this.serviceProvider.getOauthManager().setScopes(scopes);
             return this;
         }
 
@@ -81,16 +77,16 @@ public final class ServiceProviderRequest {
         }
 
         public RequestBuilder withUser(String user){
-            if(this.oauthManager == null){
-                throw new IllegalArgumentException("ERROR: No OAuth manager found to set the user for");
+            if(this.serviceProvider.getOauthManager() == null || this.apiClient == null){
+                throw new IllegalArgumentException("ERROR: No OAuth manager OR API client found to set the user for");
             }
             this.user = user;
-            this.oauthManager.setUser(user);
+            this.serviceProvider.getOauthManager().setUser(user);
+            this.apiClient.setUserForOperation(user);
             return this;
         }
 
         public ServiceProviderRequest build() {
-            this.serviceProvider.setOauthManager(oauthManager);
             ServiceProviderRequest serviceProviderRequest = new ServiceProviderRequest(this);
             return serviceProviderRequest;
         }

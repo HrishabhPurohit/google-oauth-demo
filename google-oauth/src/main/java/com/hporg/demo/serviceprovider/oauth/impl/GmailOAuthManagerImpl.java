@@ -80,6 +80,7 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
                     .Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecret, this.getScopes())
                     .setAccessType("offline")
+                    .setApprovalPrompt("auto")
                     .build();
             
             LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
