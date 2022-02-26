@@ -1,0 +1,19 @@
+<!DOCTYPE aspectj PUBLIC
+        "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+        <aspectj>
+
+            <weaver options="-verbose -showWeaveInfo">
+        
+                <include within="com.hporg.demo.serviceprovider.oauth..*"/>
+                <include within="com.hporg.demo.serviceprovider.api.client..*"/>
+                <include within="com.hporg.demo.utils.annotation.RetryableAspect"/>
+        
+            </weaver>
+        
+            <aspects>
+        
+                <aspect name="com.hporg.demo.utils.annotation.RetryableAspect"/>
+        
+            </aspects>
+        
+        </aspectj>

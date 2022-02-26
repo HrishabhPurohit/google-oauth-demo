@@ -16,6 +16,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager;
 import com.hporg.demo.utils.GoogleOAuthDemoUtil;
+import com.hporg.demo.utils.annotation.Retryable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,6 +70,7 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
         return getOAuthCredentials(this.getApproach(), GoogleNetHttpTransport.newTrustedTransport());
     }
 
+    @Retryable(onException = IOException.class)
     private OAuthTokenImpl getOAuthCredentials(String approach, final NetHttpTransport HTTP_TRANSPORT) throws IOException{
         LOGGER.debug("Trying to authenticate user : " + this.getUser() + " with approach : " + this.getApproach());
         OAuthTokenImpl oauthCredentialObject = null;
@@ -128,15 +130,11 @@ public class GmailOAuthManagerImpl extends AbstractServiceProviderOAuthManager {
         }
 
         @Override
+        @Retryable(onException = IOException.class)
         public void refreshToken() throws Exception {
             boolean isAccessTokenRefreshed = false;
 
-            try{
-               isAccessTokenRefreshed = this.oauthCredentialObject.refreshToken();
-            } catch (IOException ioe){
-                LOGGER.error("IOException occurred while refreshing token for user : " + getUser() + ". Retrying once again.", ioe);
-                isAccessTokenRefreshed = this.oauthCredentialObject.refreshToken();
-            }
+            isAccessTokenRefreshed = this.oauthCredentialObject.refreshToken();
             
             if(isAccessTokenRefreshed){
                 LOGGER.debug("Successfully refreshed access token for user : " + getUser());
