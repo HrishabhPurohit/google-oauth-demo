@@ -17,6 +17,7 @@ import com.google.api.services.gmail.model.Message;
 import com.hporg.demo.constants.Constants;
 import com.hporg.demo.serviceprovider.api.client.IServiceProviderAPIClient;
 import com.hporg.demo.serviceprovider.oauth.AbstractServiceProviderOAuthManager.AbstractOAuthToken;
+import com.hporg.demo.utils.annotation.Retryable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,30 +46,19 @@ public class GmailAPIClient implements IServiceProviderAPIClient<Gmail>{
 
         switch (userAction) {
             case "READ_MAIL":
-                try {
-                    LOGGER.debug("Trying to perform action : " + userAction + " on user : " + this.user);
-                    responseFromClientAction = readMail(apiClientService);
-                } catch (IOException e) {
-                    LOGGER.error("IOException occurred while performing action : " + userAction + " on user : " + this.user, e);
-                    LOGGER.error("ERROR: Attempting to retry performing action on the user once again");
-                    responseFromClientAction = readMail(apiClientService);
-                }
+                LOGGER.debug("Trying to perform action : " + userAction + " on user : " + this.user);
+                responseFromClientAction = readMail(apiClientService);
                 break;
             case "READ_LABEL":
-                try {
-                    LOGGER.debug("Trying to perform action : " + userAction + " on user : " + this.user);
-                    responseFromClientAction = readLabel(apiClientService);
-                } catch (IOException e) {
-                    LOGGER.error("IOException occurred while performing action : " + userAction + " on user : " + this.user, e);
-                    LOGGER.error("ERROR: Attempting to retry performing action on the user once again");
-                    responseFromClientAction = readLabel(apiClientService);
-                }
+                LOGGER.debug("Trying to perform action : " + userAction + " on user : " + this.user);
+                responseFromClientAction = readLabel(apiClientService);
                 break;
         }
 
         return responseFromClientAction;
     }
 
+    @Retryable(onException = IOException.class)
     private String readMail(Gmail apiClientService) throws IOException{
         String clientResponse = null;
 
@@ -83,6 +73,7 @@ public class GmailAPIClient implements IServiceProviderAPIClient<Gmail>{
         return clientResponse;
     }
 
+    @Retryable(onException = IOException.class)
     private String readLabel(Gmail apiClientService) throws IOException{
         String clientResponse = null;
 
@@ -109,15 +100,10 @@ public class GmailAPIClient implements IServiceProviderAPIClient<Gmail>{
     }
 
     @Override
+    @Retryable(onException = IOException.class)
     public Gmail buildAPIClientServiceObject(AbstractOAuthToken oauthCredential) throws GeneralSecurityException, IOException {
         NetHttpTransport http_transport;
-        try{
-            http_transport = GoogleNetHttpTransport.newTrustedTransport();
-        } catch (IOException ioe){
-            LOGGER.error("IOException occurred while creating credential object for user : " + this.user, ioe);
-            LOGGER.error("Attempting to rebuild credential object for the user.");
-            http_transport = GoogleNetHttpTransport.newTrustedTransport();
-        }
+        http_transport = GoogleNetHttpTransport.newTrustedTransport();
 
         final NetHttpTransport HTTP_TRANSPORT = http_transport;
         

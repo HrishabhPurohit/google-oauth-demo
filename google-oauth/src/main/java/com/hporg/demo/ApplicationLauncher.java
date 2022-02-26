@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.context.annotation.PropertySource;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
  * <p><b>NOTE:</b> OAuth 2.0 is provided by Google OAuth client libraries, declared as dependencies to this application.
  */
 @SpringBootApplication
+@EnableLoadTimeWeaving
 @PropertySource("classpath:application.properties")
 public class ApplicationLauncher 
 {
