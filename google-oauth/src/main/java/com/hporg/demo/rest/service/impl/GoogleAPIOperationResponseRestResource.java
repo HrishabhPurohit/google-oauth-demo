@@ -13,6 +13,7 @@ import com.hporg.demo.utils.GoogleOAuthDemoUtil;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,9 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
     private String actionForOperation;
     private List<String> scopeForOperation;
     private String apiForOperation;
+    
+    @Value("${google.oauth.demo.app.request.caching}")
+    private boolean isAppRequestCachingEnabled;
     
     @SuppressWarnings("unchecked")
     private void populateOperationFields(String payload) throws Exception{
@@ -70,7 +74,7 @@ public class GoogleAPIOperationResponseRestResource implements GoogleOAuthDemoRe
 
         Boolean isSPRCached = GoogleOAuthDemoUtil.isSPRCached(generateKeyForSPRCache());
 
-        if(isSPRCached != null && isSPRCached){
+        if(isAppRequestCachingEnabled && isSPRCached != null && isSPRCached){
             response = GoogleOAuthDemoUtil.getSPRFromCache(generateKeyForSPRCache());
         }
         else{
