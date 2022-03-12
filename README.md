@@ -1,3 +1,5 @@
+![image](https://img.shields.io/github/issues/HrishabhPurohit/google-oauth-demo)  ![image](https://img.shields.io/badge/maven--build-passing-green)  ![image](https://img.shields.io/badge/contributors-1-green?url=https://github.com/HrishabhPurohit/google-oauth-demo/graphs/contributors) ![image](https://img.shields.io/github/stars/HrishabhPurohit/google-oauth-demo)  ![image](https://img.shields.io/twitter/url?label=Follow%20%40HrishabhPurohit&style=social&url=https%3A%2F%2Ftwitter.com%2FHrishabhPurohi1)
+
 # Gmail scraping using Google OAuth 2.0
 This utility demonstrates how Google OAuth can be implemented using Google OAuth 2.0 client. The application scope has been strictly restricted to the usage of GMail service. This implies that the OAuth 2.0 use cases that could be performed through this application are GMail specific.
 
